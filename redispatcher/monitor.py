@@ -37,7 +37,11 @@ def monitor_cli():
     parser.add_argument("config_path", help="path to the worker pool config (my.module.path:config)")
     args = parser.parse_args()
 
-    mod = importlib.import_module(args.config_path)
+    config_path: str = args.config_path
+    if config_path.endswith(".py"):
+        config_path = config_path.replace("/", ".").replace(".py", "")
+
+    mod = importlib.import_module(config_path)
 
     configs_to_process = []
 
