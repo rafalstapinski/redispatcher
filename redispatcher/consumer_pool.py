@@ -1,13 +1,10 @@
 import asyncio
 import json
-from typing import List, Type
 
 import aioredis
-from pydantic import BaseModel, BaseSettings, RedisDsn
 
 from redispatcher.base_consumer import BaseConsumer
-from redispatcher.config import ConsumerConfig, RedispatcherConfig
-from redispatcher.models import MessageContainer
+from redispatcher.config import RedispatcherConfig
 
 
 class ConsumerPool:
@@ -47,8 +44,6 @@ class ConsumerPool:
         while True:
             # block until we get a free worker from our pool
             consumer: BaseConsumer = await self.pool.get()
-
-            await asyncio.sleep(1)
 
             # for this worker, try to get a message
             message = await self.redis_client.lpop(consumer.QUEUE)
