@@ -4,7 +4,7 @@ from .consumer_pool import ConsumerPool
 from .models import MessageContainer
 from .monitor import monitor_cli
 
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 
 __all__ = [
     # Consumer

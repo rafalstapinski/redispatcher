@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "redispatcher"
-version = "0.1.5"
+version = "0.1.6"
 description = "Toolset for asynchronous message processing backed by Redis as the message broker"
 authors = ["Rafal Stapinski <stapinskirafal@gmail.com>"]
 readme = "README.md"

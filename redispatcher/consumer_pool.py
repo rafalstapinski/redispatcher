@@ -15,9 +15,6 @@ class ConsumerPool:
 
         # this will act as our pool of available workers
         self.pool = asyncio.Queue()
-        for consumer_config in config.consumers:
-            # toss them all on to the queue
-            self.pool.put_nowait(consumer_config.consumer_class())
 
     async def _consume_wrapper(self, consumer: BaseConsumer, message_str: str):
         # this will run the worker on our message
@@ -36,6 +33,11 @@ class ConsumerPool:
     async def _run(self):
 
         self.redis_client = await aioredis.create_redis_pool(self.config.redis_dsn)
+        for consumer_config in self.config.consumers:
+            # toss them all on to the queue
+            consumer = consumer_config.consumer_class()
+            consumer.redis = self.redis_client
+            self.pool.put_nowait(consumer)
 
         # we go through our consumers round robin (ish) style, getting the first
         # available one, processing it in the background, and adding it back to the
