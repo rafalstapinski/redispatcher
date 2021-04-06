@@ -3,6 +3,6 @@ from .config import ConsumerConfig, RedispatcherConfig
 from .consumer_pool import ConsumerPool
 from .models import MessageContainer
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = ["BaseConsumer", "ConsumerConfig", "RedispatcherConfig", "ConsumerPool", "MessageContainer"]
