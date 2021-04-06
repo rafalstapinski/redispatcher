@@ -101,6 +101,8 @@ Take a look at `examples/nicer_consumer.py` and `examples/example_publisher.py` 
 
 ### Contributing
 
-If you have a suggestion on how to improve redispatcher or experience a bug file an issue at github.com/rafalstapinski/redispatcher/issues.
+If you have a suggestion on how to improve redispatcher or experience a bug file an issue at <https://github.com/rafalstapinski/redispatcher/issues>.
 
-If you want to contribute, open a PR at github.com/rafalstapinski/redispatcher.
+If you want to contribute, open a PR at <https://github.com/rafalstapinski/redispatcher>.
+
+PyPi: <https://pypi.org/project/redispatcher/>
