@@ -1,4 +1,4 @@
-# redispatcher
+# (re)dispatcher
 
 redispatcher is a small library that allows you to specify a pool of workers that listen to messages added to queues in Redis. This allows you to execute long running background tasks asynchronously, like sending a welcome email after a user registers.
 
