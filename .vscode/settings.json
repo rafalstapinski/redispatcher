@@ -1,30 +1,36 @@
 {
-  "python.pythonPath": ".venv/bin/python",
-  "python.formatting.provider": "black",
-  "python.linting.mypyEnabled": false,
-  "python.formatting.blackPath": ".venv/bin/black",
-  "python.linting.mypyPath": ".venv/bin/mypy",
-  "python.formatting.blackArgs": [
-    "--line-length",
-    "120"
+  // Python
+  "python.languageServer": "Pylance",
+  "python.testing.pytestArgs": [
+    "test"
   ],
+  "python.testing.pytestEnabled": true,
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": true,
+  // Editor
   "git.ignoreLimitWarning": true,
   "files.insertFinalNewline": true,
-  "editor.formatOnSave": true,
+  // Languages
   "[python]": {
     "editor.tabSize": 4,
-    "editor.codeActionsOnSave": {
-      "source.fixAll": true,
-    }
   },
-  "python.languageServer": "Pylance",
+  "[json]": {
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true
+  },
+  // Actions
   "emeraldwalk.runonsave": {
     "commands": [
       {
-        "cmd": ".venv/bin/isort --sp isort.cfg ${file}",
+        "cmd": ".venv/bin/isort --sp pyproject.toml ${file}",
+        "isAsync": true,
+        "match": "\\.py$"
+      },
+      {
+        "cmd": ".venv/bin/black --config pyproject.toml ${file}",
         "isAsync": true,
         "match": "\\.py$"
       }
     ]
-  }
+  },
 }
