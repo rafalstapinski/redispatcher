@@ -1,0 +1,6 @@
+class RedispatcherException(Exception):
+    ...
+
+
+class UndefinedQueue(RedispatcherException):
+    ...

@@ -5,7 +5,7 @@ from typing import List
 
 import aioredis
 
-from .config import RedispatcherConfig
+from redispatcher.config import RedispatcherConfig
 
 
 async def _cli_configs_stats(configs: List[RedispatcherConfig]):
