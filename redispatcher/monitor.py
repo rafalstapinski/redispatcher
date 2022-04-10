@@ -5,7 +5,6 @@ from typing import List
 
 import aioredis
 
-from .base_consumer import BaseConsumer
 from .config import RedispatcherConfig
 
 

@@ -1,9 +1,4 @@
 import asyncio
-import os
-
-from elasticapm.base import Client as ElasticAPMClient
-from elasticapm.traces import Transaction, execution_context
-from elasticapm.utils.disttracing import TraceParent
 
 from redispatcher import BaseConsumer
 
