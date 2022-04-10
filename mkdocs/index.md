@@ -1,4 +1,40 @@
-# (re)dispatcher
+# redispatcher
+
+<a href="https://rafalstapinski.github.io/redispatcher">
+  <img src="https://rafalstapinski.github.io/redispatcher/img/logo.svg" alt="redispatcher logo" />
+</a>
+
+<p align="center">
+  <strong>
+    <em>
+      Utilitarian Python ORM for Postgres, backed by <a href="https://github.com/MagicStack/asyncpg">asyncpg</a>, <a href="https://github.com/samuelcolvin/pydantic">Pydantic</a>, and <a href="https://github.com/kayak/pypika">PyPika</a>
+    </em>
+  </strong>
+</p>
+
+---
+
+**Documentation**: <a href="https://rafalstapinski.github.io/redispatcher">https://rafalstapinski.github.io/redispatcher</a>
+
+**Source Code**: <a href="https://github.com/rafalstapinski/redispatcher">https://github.com/rafalstapinski/redispatcher</a>
+
+---
+
+<p align="center">
+  <a href="https://github.com/rafalstapinski/porm/actions/workflows/test.yml" target="_blank">
+    <img src="https://github.com/rafalstapinski/porm/actions/workflows/test.yml/badge.svg" alt="Test Status" />
+  </a>
+  <a href="https://pypi.org/project/redispatcher" target="_blank">
+    <img src="https://img.shields.io/pypi/v/redispatcher?color=%2334D058" alt="pypi" />
+  </a>
+  <a href="https://pypi.org/project/redispatcher" target="_blank">
+    <img src="https://img.shields.io/pypi/pyversions/redispatcher?color=%23334D058" alt="Supported Python Versions: 3.8, 3.9, 3.10" />
+  </a>
+  <a href="https://github.com/rafalstapinski/redispatcher/blob/master/LICENSE" target="_blank">
+    <img src="https://img.shields.io/pypi/l/redispatcher?color=%23334D058" alt="MIT License" />
+  </a>
+</p>
+
 
 redispatcher is a small library that allows you to specify a pool of workers that listen to messages added to queues in Redis. This allows you to execute long running background tasks asynchronously, like sending a welcome email after a user registers.
 
