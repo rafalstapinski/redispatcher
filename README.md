@@ -7,7 +7,7 @@
 <p align="center">
   <strong>
     <em>
-      Utilitarian Python ORM for Postgres, backed by <a href="https://github.com/MagicStack/asyncpg">asyncpg</a>, <a href="https://github.com/samuelcolvin/pydantic">Pydantic</a>, and <a href="https://github.com/kayak/pypika">PyPika</a>
+        Asynchronous python worker service brokered by Redis
     </em>
   </strong>
 </p>
