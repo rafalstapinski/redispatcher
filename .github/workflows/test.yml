@@ -1,0 +1,51 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:6
+
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10"]
+      fail-fast: false
+
+    steps:
+      # Check out
+      - uses: actions/checkout@v2
+
+      # Set up Python
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Install poetry
+      - uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: "1.1.12"
+
+      # Install deps
+      - run: poetry install
+
+      # Test
+      - run: poetry run pytest test
+
+      # isort
+      - run: poetry run isort --sp pyproject.toml --check .
+
+      # black
+      - run: poetry run black --config pyproject.toml --check .
+
+      # pylint
+      - run: poetry run pylint redispatcher/
+
+      # check versions match
+      - run: poetry run python scripts/assert_package_versions_match.py
