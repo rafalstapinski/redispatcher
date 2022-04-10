@@ -21,8 +21,8 @@
 ---
 
 <p align="center">
-  <a href="https://github.com/rafalstapinski/porm/actions/workflows/test.yml" target="_blank">
-    <img src="https://github.com/rafalstapinski/porm/actions/workflows/test.yml/badge.svg" alt="Test Status" />
+  <a href="https://github.com/rafalstapinski/redispatcher/actions/workflows/test.yml" target="_blank">
+    <img src="https://github.com/rafalstapinski/redispatcher/actions/workflows/test.yml/badge.svg" alt="Test Status" />
   </a>
   <a href="https://pypi.org/project/redispatcher" target="_blank">
     <img src="https://img.shields.io/pypi/v/redispatcher?color=%2334D058" alt="pypi" />
