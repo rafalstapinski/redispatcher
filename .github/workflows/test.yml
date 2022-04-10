@@ -9,43 +9,44 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      redis:
-        image: redis:6
-
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10"]
       fail-fast: false
 
     steps:
-      # Check out
-      - uses: actions/checkout@v2
+      - name: Check out
+        uses: actions/checkout@v2
 
-      # Set up Python
-      - uses: actions/setup-python@v2
+      - name: Set up redis
+        uses: supercharge/redis-github-action@1.4.0
+        with:
+          redis-version: 6
+
+      - name: Set up python
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
 
-      # Install poetry
-      - uses: abatilo/actions-poetry@v2.0.0
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: "1.1.12"
 
-      # Install deps
-      - run: poetry install
+      - name: Install dependencies
+        run: poetry install
 
-      # Test
-      - run: poetry run pytest test
+      - name: Run pytest
+        run: poetry run pytest test
 
-      # isort
-      - run: poetry run isort --sp pyproject.toml --check .
+      - name: Run isort
+        run: poetry run isort --sp pyproject.toml --check .
 
-      # black
-      - run: poetry run black --config pyproject.toml --check .
+      - name: Run black
+        run: poetry run black --config pyproject.toml --check .
 
-      # pylint
-      - run: poetry run pylint redispatcher/
+      - name: Run pylint
+        run: poetry run pylint redispatcher/
 
-      # check versions match
-      - run: poetry run python scripts/assert_package_versions_match.py
+      - name: Check package version
+        run: poetry run python scripts/assert_package_versions_match.py
