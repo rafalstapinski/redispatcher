@@ -7,7 +7,7 @@
 <p align="center">
   <strong>
     <em>
-        Asynchronous python worker service brokered by Redis
+        Daemon to run work asynchronously, backed by Redis
     </em>
   </strong>
 </p>
