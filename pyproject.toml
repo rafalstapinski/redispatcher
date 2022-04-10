@@ -3,23 +3,11 @@ name = "redispatcher"
 version = "0.1.6"
 description = "Toolset for asynchronous message processing backed by Redis as the message broker"
 authors = ["Rafal Stapinski <stapinskirafal@gmail.com>"]
+keywords = ["redis", "queue", "broker", "pub sub", "asynchronous message"]
 readme = "README.md"
+license = "MIT"
 homepage = "https://github.com/rafalstapinski/redispatcher"
 repository = "https://github.com/rafalstapinski/redispatcher"
-keywords = ["redis", "queue", "broker", "pub sub", "asynchronous message"]
-classifiers = [
-    "Environment :: Web Environment",
-    "Framework :: AsyncIO",
-    "Operating System :: OS Independent",
-    "Intended Audience :: Developers",
-    "Topic :: Software Development :: Libraries",
-    "Operating System :: OS Independent",
-    "License :: OSI Approved :: MIT License"
-]
-include = [
-    "LICENSE"
-]
-license = "MIT"
 
 
 [tool.poetry.dependencies]
