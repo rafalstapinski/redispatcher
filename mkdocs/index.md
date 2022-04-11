@@ -7,7 +7,7 @@
 <p align="center">
   <strong>
     <em>
-        Daemon to run work asynchronously, backed by Redis
+        Run distributed work asynchronously, backed by Redis
     </em>
   </strong>
 </p>
@@ -35,39 +35,30 @@
   </a>
 </p>
 
+redispatcher is a library and daemon for scheduling work and running it asynchronously (like <a href="https://github.com/celery/celery" >Celery</a> or <a href="https://github.com/bogdaBogdanp/dramatiq">dramatiq</a>). It allows you to execute background tasks asynchronously, like sending a welcome email after a user registers.
 
-redispatcher is a small library that allows you to specify a pool of workers that listen to messages added to queues in Redis. This allows you to execute long running background tasks asynchronously, like sending a welcome email after a user registers.
 
-redispatcher relies on
+## Features
+* Full intellisense support across your code, despite a distributed workload
+* Easier and faster to set up and integrate than alternatives
+* Super low overhead and completely non-blocking, thanks to `asyncio`
+
+### Dependencies
 * `aioredis` to publish to Redis queues and for your consumers to read from Redis
 * `pydantic` to validate all messages and make sure they conform to the shape you specify
 
-### You should try redispatcher if you
-* Have a redis instance
-* Have a web service that needs to process long running tasks asynchronously
-* Don't want to deal with setting up Rabbit and cumbersome libraries like Celery
 
-
-## Overview
-
-redispatcher can be broken down into three (ish) parts.
-
-#### Consumer
-It all begins with a consumer. A consumer is just a class that defines the structure of the mssages it will be listening for and a function that implements the logic for processing that message.
-
-#### Publishing
-Every consumer you define will provide you with an easy `publish` method that you can use to queue up messages. Because we use Pydantic, it will validate and ensure that any messages you send/receive have to be formatted correctly. 
-
-#### Consumer Pool
-A consumer pool is a separate process that listens for all relevant messages queued up in Redis and dispatches them to the designated consumers to be processed.
-
-
-## Install
+## Installation
+Install with `poetry`
+```bash
+$ poetry add redispatcher
+```
+or with `pip`
 ```bash
 $ pip install redispatcher
 ```
-
-### Basic Consumer
+## Basic Usage
+### Running your workers
 ```python
 # my_consumer.py
 from redispatcher import BaseConsumer
@@ -87,17 +78,14 @@ class MyConsumer(BaseConsumer):
 
 ```
 
-### Running your consumers in a pool
-
-#### Defining your pool
 ```python
-# pool.py
-from redispatcher import ConsumerPool, RedispatcherConfig, ConsumerConfig
+# dispatcher.py
+from redispatcher import Redispatcher, RedispatcherConfig, ConsumerConfig
 
 from my_consumer import MyConsumer
 
 config = RedispatcherConfig(
-    redis_dsn="rediss://", # if not provided, will read from env
+    redis_dsn="rediss://",
     consumers=[
         ConsumerConfig(
             consumer_class=MyConsumer
@@ -106,15 +94,15 @@ config = RedispatcherConfig(
 )
 
 if __name__ == "__main__":
-    consumer_pool = ConsumerPool(config)
-    consumer_pool.start() 
+    dispatcher = Redispatcher(config)
+    dispatcher.start() 
 ```
 
 ```bash
-$ python pool.py
+$ python dispatcher.py
 ```
 
-### Publishing messages to your pool
+### Publishing messages
 ```python
 # endpoint.py
 
@@ -123,17 +111,10 @@ from clients import my_aioredis_client
 
 @app.post("/signup")
 async def signup()
-    # queue up work to send a welcome email while we continue with the rest of our endpoint logic
+    ...
     await MyConsumer.publish(MyConsumer.Message(email=..., name=..., registered=True), my_aioredis_client)
+    ...
 ```
-
-
-### Advanced usage
-
-We built redispatcher with a couple of handy utilities, but kept it as minimal as possible for your own consumers to be subclassed and implement any logging/tracing/etc logic yourself. 
-
-Take a look at `examples/nicer_consumer.py` and `examples/example_publisher.py` for some examples of what's possible.
-
 
 ### Contributing
 
