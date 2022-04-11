@@ -1,7 +1,7 @@
 from .base_consumer import BaseConsumer
 from .config import ConsumerConfig, RedispatcherConfig
-from .consumer_pool import ConsumerPool
 from .monitor import monitor_cli
+from .redispatcher import Redispatcher
 from .types import MessageContainer
 
 __version__ = "0.1.6"
@@ -13,7 +13,7 @@ __all__ = [
     "ConsumerConfig",
     "RedispatcherConfig",
     # Pool
-    "ConsumerPool",
+    "Redispatcher",
     # Arbitrary Models
     "MessageContainer",
     # Scripts

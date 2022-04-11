@@ -1,4 +1,6 @@
-from typing import List, Optional, Type
+from optparse import Option
+from threading import Event
+from typing import List, Optional, Type, Union
 
 from pydantic import BaseModel, BaseSettings, RedisDsn
 
@@ -13,4 +15,5 @@ class ConsumerConfig(BaseModel):
 class RedispatcherConfig(BaseSettings):
     consumers: List[ConsumerConfig]
     logger: Optional[Logger] = None
-    redis_dsn: RedisDsn
+    redis_dsn: Optional[Union[RedisDsn, str]] = None
+    exit_event: Optional[Event] = None

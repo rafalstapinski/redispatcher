@@ -4,8 +4,8 @@ from pydantic import BaseModel
 
 
 class MessageContainer(BaseModel):
-    headers: BaseModel
-    body: BaseModel
+    headers: dict
+    body: dict
 
 
 class Logger:
