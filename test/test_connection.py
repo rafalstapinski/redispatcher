@@ -17,7 +17,7 @@ def test_connect_with_url(redis: Redis):
     )
     dispatcher = Redispatcher(config)
 
-    thread = Thread(target=dispatcher.run)
+    thread = Thread(target=dispatcher.start)
     thread.start()
     sleep(0.01)
 
@@ -34,7 +34,7 @@ def test_connect_with_environ(redis: Redis):
     config = RedispatcherConfig(consumers=[ConsumerConfig(consumer_class=ConsumerOne)], exit_event=Event())
     dispatcher = Redispatcher(config)
 
-    thread = Thread(target=dispatcher.run)
+    thread = Thread(target=dispatcher.start)
     thread.start()
     sleep(0.001)
 
