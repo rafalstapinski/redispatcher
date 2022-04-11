@@ -36,8 +36,6 @@ jobs:
       - name: Install dependencies
         run: poetry install
 
-      - run: which redis-server
-
       - name: Run pytest
         run: poetry run pytest test
 
