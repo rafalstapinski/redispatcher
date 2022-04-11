@@ -17,11 +17,11 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v2
-
-      - name: Set up redis
-        uses: supercharge/redis-github-action@1.4.0
-        with:
-          redis-version: 6
+      
+      - name: Install redis-server
+        run: |
+          sudo apt-get update
+          sudo apt-get install redis-server
 
       - name: Set up python
         uses: actions/setup-python@v2
