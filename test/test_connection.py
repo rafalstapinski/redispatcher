@@ -36,7 +36,7 @@ def test_connect_with_environ(redis: Redis):
 
     thread = Thread(target=dispatcher.start)
     thread.start()
-    sleep(0.001)
+    sleep(0.01)
 
     connection: RedisConnection = dispatcher.redis_client.connection
     assert connection.closed == False

@@ -1,3 +1,5 @@
+from multiprocessing.managers import BaseManager
+
 from pydantic import BaseModel
 
 from redispatcher import BaseConsumer
@@ -6,7 +8,7 @@ from redispatcher import BaseConsumer
 class ConsumerOne(BaseConsumer):
     QUEUE = "queue-one"
 
-    class Message(BaseModel):
+    class Message(BaseConsumer.Message):
         id: int
         text: str
 
