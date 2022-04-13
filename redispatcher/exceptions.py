@@ -8,3 +8,7 @@ class UndefinedQueue(RedispatcherException):
 
 class UndefinedMessage(RedispatcherException):
     ...
+
+
+class InvalidConfig(RedispatcherException):
+    ...
