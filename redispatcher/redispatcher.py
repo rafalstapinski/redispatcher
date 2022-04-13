@@ -34,7 +34,6 @@ class Redispatcher:
         try:
             await consumer.process_message(message_body, message_headers)
         except Exception as e:
-
             ...
 
     async def _run(self):

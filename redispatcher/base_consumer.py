@@ -32,7 +32,7 @@ class BaseConsumer(ABC):
         self.redis_client = redis_client
 
     @classmethod
-    async def publish(cls, message_body: Message, redis_client: Redis):
+    async def publish(cls, message_body: BaseModel, redis_client: Redis):
         headers = cls.headers()
         message = MessageContainer(body=message_body.dict(), headers=headers.dict())
         resp = await redis_client.rpush(cls.QUEUE, message.json())

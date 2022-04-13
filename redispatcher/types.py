@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from pydantic import BaseModel
 
@@ -9,6 +9,6 @@ class MessageContainer(BaseModel):
 
 
 class Logger:
-    info: Callable[[str, Any, Any], None]
-    warning: Callable[[str, Any, Any], None]
-    exception: Callable[[str, Any, Any], None]
+    info: Callable[[str, Optional[Any], Optional[Any]], None]
+    warning: Callable[[str, Optional[Any], Optional[Any]], None]
+    exception: Callable[[str, Optional[Any], Optional[Any]], None]
