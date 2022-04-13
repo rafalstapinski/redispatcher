@@ -24,12 +24,12 @@ async def test_publish_and_consume(redis: Redis):
 
     thread = Thread(target=dispatcher.start)
     thread.start()
-    await sleep(0.01)
+    await sleep(0.1)
 
     redis_client = await aioredis.create_redis(config.redis_dsn)
-    for i in range(10000):
+    await ConsumerTwo.publish(ConsumerTwo.Message(id=123, text="hello"), redis_client)
 
-        await ConsumerTwo.publish(ConsumerTwo.Message(id=123, text="hello"), redis_client)
+    await sleep(0.1)
 
     assert json.loads(redis.get("message1")) == ConsumerTwo.Message(id=123, text="hello").dict()
     assert json.loads(redis.get("headers1")) == ConsumerTwo.headers().dict()
