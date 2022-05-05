@@ -1,4 +1,3 @@
-from optparse import Option
 from threading import Event
 from typing import List, Optional, Type, Union
 
