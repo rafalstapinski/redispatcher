@@ -1,6 +1,6 @@
 from examples.basic_consumer import BasicConsumer
 from examples.nicer_consumer import NicerConsumer
-from redispatcher import ConsumerConfig, ConsumerPool, RedispatcherConfig
+from redispatcher import ConsumerConfig, Redispatcher, RedispatcherConfig
 
 # We specify our consumers. Let's throw both the Nicer and Basic consumers into the
 # same pool for the heck of it, but in production we only ever use the same type of
@@ -17,5 +17,5 @@ config = RedispatcherConfig(
 )
 
 if __name__ == "__main__":
-    consumer_pool = ConsumerPool(config)
+    consumer_pool = Redispatcher(config)
     consumer_pool.start()

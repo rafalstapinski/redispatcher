@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "redispatcher"
 version = "0.1.6"
-description = "Daemon to run work asynchronously, backed by Redis"
+description = "Dispatch and run distributed work asynchronously, brokered by Redis"
 authors = ["Rafal Stapinski <stapinskirafal@gmail.com>"]
-keywords = ["redis", "queue", "broker", "pub sub", "asynchronous message", "celery", "dispatcher"]
+keywords = ["redis", "queue", "broker", "pub sub", "asynchronous message", "celery", "dispatcher", "worker"]
 readme = "README.md"
 license = "MIT"
-homepage = "https://github.com/rafalstapinski/redispatcher"
+homepage = "https://rafalstapinski.github.io/redispatcher"
 repository = "https://github.com/rafalstapinski/redispatcher"
 
 
