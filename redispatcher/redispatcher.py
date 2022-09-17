@@ -6,18 +6,20 @@ from aioredis import Redis
 
 from redispatcher.base_consumer import BaseConsumer
 from redispatcher.config import RedispatcherConfig
-from redispatcher.types import MessageContainer
+from redispatcher.types import LoggerType, MessageContainer
 
 
 class Redispatcher:
 
     redis_client: Redis
+    config: RedispatcherConfig
+    logger: LoggerType
+    consumer_pool: asyncio.Queue[BaseConsumer]
 
     def __init__(self, config: RedispatcherConfig):
 
         self.config = config
         self.logger = self.config.logger or logging.getLogger(__name__)
-
         self.consumer_pool = asyncio.Queue()
 
     async def _consume(self, consumer: BaseConsumer, message_str: str):
@@ -37,17 +39,19 @@ class Redispatcher:
             self.logger.exception(f"Error processing message {consumer=} {e=}")
 
     async def _run(self):
-
         self.logger.info("Starting redispatcher")
 
         self.redis_client = await aioredis.create_redis(self.config.redis_dsn)
 
         # Toss consumers on the queue
         for consumer_config in self.config.consumers:
-            consumer = consumer_config.consumer_class(self.redis_client)
 
-            self.logger.info(f"Initializing {consumer}")
-            await self.consumer_pool.put(consumer)
+            consumer_class = consumer_config.consumer_class
+            consumer_count = consumer_config.count
+            self.logger.info(f"Initializing {consumer_class=} with {consumer_count=}")
+
+            for _ in range(consumer_count):
+                await self.consumer_pool.put(consumer_class(self.redis_client))
 
         self.logger.info("Starting to listen for messages")
 

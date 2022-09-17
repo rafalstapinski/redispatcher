@@ -11,7 +11,16 @@ from redispatcher import ConsumerConfig, Redispatcher, RedispatcherConfig
 from test.fixtures.consumers import ConsumerOne, ConsumerTwo
 
 config = RedispatcherConfig(
-    consumers=[ConsumerConfig(consumer_class=ConsumerOne), ConsumerConfig(consumer_class=ConsumerTwo)],
+    consumers=[
+        ConsumerConfig(
+            consumer_class=ConsumerOne,
+            count=2,
+        ),
+        ConsumerConfig(
+            consumer_class=ConsumerTwo,
+            count=3,
+        ),
+    ],
     redis_dsn="redis://localhost:1234/0",
     exit_event=Event(),
 )
@@ -36,3 +45,21 @@ async def test_publish_and_consume(redis: Redis):
 
     config.exit_event.set()
     thread.join()
+
+
+@pytest.mark.asyncio
+async def test_consumers_initialized(redis: Redis):
+    dispatcher = Redispatcher(config)
+
+    consumers = []
+    while not dispatcher.consumer_pool.empty():
+        consumers.append(await dispatcher.consumer_pool.get())
+
+    thread = Thread(target=dispatcher.start)
+    thread.start()
+    await sleep(0.1)
+
+    config.exit_event.set()
+
+    assert len([c for c in consumers if isinstance(c, ConsumerOne)]) == 2
+    assert len([c for c in consumers if isinstance(c, ConsumerTwo)]) == 3
