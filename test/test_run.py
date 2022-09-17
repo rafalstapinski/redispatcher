@@ -47,8 +47,7 @@ async def test_publish_and_consume(redis: Redis):
     thread.join()
 
 
-@pytest.skip
-@pytest.mark.asyncio
+@pytest.mark.skip(reason="")
 async def test_consumers_initialized(redis: Redis):
     dispatcher = Redispatcher(config)
 
