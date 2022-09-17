@@ -28,13 +28,13 @@ class Redispatcher:
             message_body = consumer.Message.parse_obj(message.body)
             message_headers = consumer.Headers.parse_obj(message.headers)
         except Exception as e:
-            self.logger.exception(f"Error parsing message {consumer.QUEUE=} {message_str=} {e=}")
+            self.logger.exception(f"Error parsing message {consumer=} {message_str=} {e=}")
 
         # Process
         try:
             await consumer.process_message(message_body, message_headers)
         except Exception as e:
-            ...
+            self.logger.exception(f"Error processing message {consumer=} {e=}")
 
     async def _run(self):
 
@@ -62,10 +62,9 @@ class Redispatcher:
                 return
 
             # Wait for next available consumer
-            # print(self.consumer_pool.qsize())
             consumer: BaseConsumer = await self.consumer_pool.get()
 
-            # Get a message
+            # Try to get a message
             message = await self.redis_client.lpop(consumer.QUEUE)
 
             # Let's consume it

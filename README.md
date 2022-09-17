@@ -7,7 +7,7 @@
 <p align="center">
   <strong>
     <em>
-        Run distributed work asynchronously, backed by Redis
+        Dispatch and run distributed work asynchronously, brokered by Redis
     </em>
   </strong>
 </p>
