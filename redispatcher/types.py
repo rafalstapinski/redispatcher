@@ -8,7 +8,8 @@ class MessageContainer(BaseModel):
     body: dict
 
 
-class Logger:
+class LoggerType:
     info: Callable[[str, Optional[Any], Optional[Any]], None]
+    error: Callable[[str, Optional[Any], Optional[Any]], None]
     warning: Callable[[str, Optional[Any], Optional[Any]], None]
     exception: Callable[[str, Optional[Any], Optional[Any]], None]

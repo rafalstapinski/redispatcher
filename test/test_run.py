@@ -27,7 +27,7 @@ async def test_publish_and_consume(redis: Redis):
     await sleep(0.1)
 
     redis_client = await aioredis.create_redis(config.redis_dsn)
-    await ConsumerTwo.publish(ConsumerTwo.Message(id=123, text="hello"), redis_client)
+    await ConsumerTwo.dispatch(ConsumerTwo.Message(id=123, text="hello"), redis_client)
 
     await sleep(0.1)
 
