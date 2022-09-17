@@ -112,14 +112,14 @@ from clients import my_aioredis_client
 @app.post("/signup")
 async def signup()
     ...
-    await MyConsumer.publish(MyConsumer.Message(email=..., name=..., registered=True), my_aioredis_client)
+    await MyConsumer.dispatch(MyConsumer.Message(email=..., name=..., registered=True), my_aioredis_client)
     ...
 ```
 
 ### Contributing
 
-If you have a suggestion on how to improve redispatcher or experience a bug file an issue at <https://github.com/rafalstapinski/redispatcher/issues>.
+`redispatcher` is ready for production usage, but is still in its infancy.
 
-If you want to contribute, open a PR at <https://github.com/rafalstapinski/redispatcher>.
+If you find a bug, <a href="https://github.com/rafalstapinski/redispatcher/issues/new">open an issue</a> with a detailed description and steps to reproduce.
 
-PyPi: <https://pypi.org/project/redispatcher/>
+If you're looking for a feature, <a href="https://github.com/rafalstapinski/redispatcher/issues/new">open an issue</a> with a detailed description and use case. Feel free <a href="https://github.com/rafalstapinski/redispatcher/pulls">open a pull request</a> if you want to contribure directly!
