@@ -240,6 +240,20 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#what-is-redispatcher" class="md-nav__link">
+    What is redispatcher
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-use-it" class="md-nav__link">
+    Why use it
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#features" class="md-nav__link">
     Features
   </a>
@@ -275,15 +289,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#running-your-workers" class="md-nav__link">
-    Running your workers
+  <a href="#defining-your-worker" class="md-nav__link">
+    Defining your worker
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#publishing-messages" class="md-nav__link">
-    Publishing messages
+  <a href="#dispatching-work" class="md-nav__link">
+    Dispatching work
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-redispatcher" class="md-nav__link">
+    Running redispatcher
   </a>
   
 </li>
@@ -350,6 +371,20 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#what-is-redispatcher" class="md-nav__link">
+    What is redispatcher
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-use-it" class="md-nav__link">
+    Why use it
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#features" class="md-nav__link">
     Features
   </a>
@@ -385,15 +420,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#running-your-workers" class="md-nav__link">
-    Running your workers
+  <a href="#defining-your-worker" class="md-nav__link">
+    Defining your worker
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#publishing-messages" class="md-nav__link">
-    Publishing messages
+  <a href="#dispatching-work" class="md-nav__link">
+    Dispatching work
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-redispatcher" class="md-nav__link">
+    Running redispatcher
   </a>
   
 </li>
@@ -435,7 +477,7 @@
 <p align="center">
   <strong>
     <em>
-        Run distributed work asynchronously, backed by Redis
+        Dispatch and run distributed work asynchronously, brokered by Redis
     </em>
   </strong>
 </p>
@@ -459,17 +501,24 @@
   </a>
 </p>
 
-<p>redispatcher is a library and daemon for scheduling work and running it asynchronously (like <a href="https://github.com/celery/celery" >Celery</a> or <a href="https://github.com/bogdaBogdanp/dramatiq">dramatiq</a>). It allows you to execute background tasks asynchronously, like sending a welcome email after a user registers.</p>
+<h2 id="what-is-redispatcher">What is redispatcher</h2>
+<p>redispatcher allows you to dispatch work that needs to be done in a process separate from your main program loop. This is useful in cases when you need to process some long running work that doesn't necessarily need to be done synchronously within your code. A classic example of this is sending a welcome email to a user as they sign up for your service. It's not necessary to wait for the results of sending an email, and it may take a few seconds to do so. redispatcher lets you fire-and-forget this work (as a message put into a Redis server) and have it be executed in the background, asynchronously, in a separate process (or machine) entirely.</p>
+<p>redispatcher comes in two parts:
+1. A library that lets you define workers, define strongly typed messages sent to workers, and provides helper functions to facilitate dispatching that work
+2. A daemon that runs your workers in a pool, consistently listening for any incoming messages to be processed</p>
+<h2 id="why-use-it">Why use it</h2>
+<p>There are certainly other solutions for orchestrating distributed workers. redispatcher aims to be super lightweight, very fast and simple to set up (there are many free cloud-hosted Redis solutions available), and has robust type validation and intellisense support.</p>
 <h2 id="features">Features</h2>
 <ul>
 <li>Full intellisense support across your code, despite a distributed workload</li>
-<li>Easier and faster to set up and integrate than alternatives</li>
-<li>Super low overhead and completely non-blocking, thanks to <code>asyncio</code></li>
+<li>Strongly typed message contract between your publishing code and consumer</li>
+<li>Minimal boilerplate required to setup and start publishing compared than most alternatives</li>
+<li>Minimal performance overhead and completely non-blocking, thanks to <code>asyncio</code> (and works with alternatives like <code>uvloop</code>)</li>
 </ul>
 <h3 id="dependencies">Dependencies</h3>
 <ul>
-<li><code>aioredis</code> to publish to Redis queues and for your consumers to read from Redis</li>
-<li><code>pydantic</code> to validate all messages and make sure they conform to the shape you specify</li>
+<li><code>aioredis</code> is used under the hood to publish message to and read messages from Redis</li>
+<li><code>pydantic</code> is used to to validate messages conform to your strongly typed contracts</li>
 </ul>
 <h2 id="installation">Installation</h2>
 <p>Install with <code>poetry</code>
@@ -479,57 +528,49 @@ or with <code>pip</code>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>$ pip install redispatcher
 </code></pre></div></p>
 <h2 id="basic-usage">Basic Usage</h2>
-<h3 id="running-your-workers">Running your workers</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># my_consumer.py</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span> <span class="nn">redispatcher</span> <span class="kn">import</span> <span class="n">BaseConsumer</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">class</span> <span class="nc">MyConsumer</span><span class="p">(</span><span class="n">BaseConsumer</span><span class="p">):</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">QUEUE</span> <span class="o">=</span> <span class="s2">&quot;my-queue-key&quot;</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="k">class</span> <span class="nc">Message</span><span class="p">(</span><span class="n">BaseConsumer</span><span class="o">.</span><span class="n">Message</span><span class="p">):</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>        <span class="n">registered</span><span class="p">:</span> <span class="nb">bool</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">Message</span><span class="p">):</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;processing message </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>        <span class="o">...</span>
+<h3 id="defining-your-worker">Defining your worker</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span> <span class="nn">redispatcher</span> <span class="kn">import</span> <span class="n">BaseConsumer</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">class</span> <span class="nc">SendWelcomeEmail</span><span class="p">(</span><span class="n">BaseConsumer</span><span class="p">):</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">QUEUE</span> <span class="o">=</span> <span class="s2">&quot;send-welcome-email&quot;</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="k">class</span> <span class="nc">Message</span><span class="p">(</span><span class="n">BaseConsumer</span><span class="o">.</span><span class="n">Message</span><span class="p">):</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">process_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">Message</span><span class="p">):</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>        <span class="c1"># construct an email and send it to the `message.email` address</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># dispatcher.py</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span> <span class="nn">redispatcher</span> <span class="kn">import</span> <span class="n">Redispatcher</span><span class="p">,</span> <span class="n">RedispatcherConfig</span><span class="p">,</span> <span class="n">ConsumerConfig</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="kn">from</span> <span class="nn">my_consumer</span> <span class="kn">import</span> <span class="n">MyConsumer</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">config</span> <span class="o">=</span> <span class="n">RedispatcherConfig</span><span class="p">(</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">redis_dsn</span><span class="o">=</span><span class="s2">&quot;rediss://&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">consumers</span><span class="o">=</span><span class="p">[</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="n">ConsumerConfig</span><span class="p">(</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>            <span class="n">consumer_class</span><span class="o">=</span><span class="n">MyConsumer</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>        <span class="p">)</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="p">]</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="p">)</span>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
-<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>    <span class="n">dispatcher</span> <span class="o">=</span> <span class="n">Redispatcher</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>    <span class="n">dispatcher</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> 
+<h3 id="dispatching-work">Dispatching work</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span> <span class="nn">clients</span> <span class="kn">import</span> <span class="n">my_aioredis_client</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/register&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">async</span> <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="o">...</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">message</span> <span class="o">=</span> <span class="n">SendWelcomeEmail</span><span class="o">.</span><span class="n">Message</span><span class="p">(</span><span class="n">email</span><span class="o">=...</span><span class="p">,</span> <span class="n">name</span><span class="o">=...</span><span class="p">,</span> <span class="n">registered</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="k">await</span> <span class="n">SendWelcomeEmail</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">my_aioredis_client</span><span class="p">)</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="o">...</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>$ python dispatcher.py
-</code></pre></div>
-<h3 id="publishing-messages">Publishing messages</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># endpoint.py</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kn">from</span> <span class="nn">my_consumer</span> <span class="kn">import</span> <span class="n">MyConsumer</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="kn">from</span> <span class="nn">clients</span> <span class="kn">import</span> <span class="n">my_aioredis_client</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/signup&quot;</span><span class="p">)</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="k">async</span> <span class="k">def</span> <span class="nf">signup</span><span class="p">()</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="o">...</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="k">await</span> <span class="n">MyConsumer</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">MyConsumer</span><span class="o">.</span><span class="n">Message</span><span class="p">(</span><span class="n">email</span><span class="o">=...</span><span class="p">,</span> <span class="n">name</span><span class="o">=...</span><span class="p">,</span> <span class="n">registered</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">my_aioredis_client</span><span class="p">)</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="o">...</span>
+<h3 id="running-redispatcher">Running redispatcher</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span> <span class="nn">redispatcher</span> <span class="kn">import</span> <span class="n">Redispatcher</span><span class="p">,</span> <span class="n">RedispatcherConfig</span><span class="p">,</span> <span class="n">ConsumerConfig</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">config</span> <span class="o">=</span> <span class="n">RedispatcherConfig</span><span class="p">(</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">redis_dsn</span><span class="o">=</span><span class="s2">&quot;redis://localhost:6379/0&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">consumers</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>        <span class="n">ConsumerConfig</span><span class="p">(</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>            <span class="n">consumer_class</span><span class="o">=</span><span class="n">SendWelcomeEmail</span><span class="p">,</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>            <span class="n">count</span><span class="o">=</span><span class="mi">2</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>        <span class="p">)</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="p">]</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="p">)</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>    <span class="n">dispatcher</span> <span class="o">=</span> <span class="n">Redispatcher</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>    <span class="n">dispatcher</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> 
 </code></pre></div>
 <h3 id="contributing">Contributing</h3>
-<p><code>redispatcher</code> is ready for production usage, but is still in its infancy.</p>
+<p><code>redispatcher</code> is already used in production, but is still in its infancy.</p>
 <p>If you find a bug, <a href="https://github.com/rafalstapinski/redispatcher/issues/new">open an issue</a> with a detailed description and steps to reproduce.</p>
 <p>If you're looking for a feature, <a href="https://github.com/rafalstapinski/redispatcher/issues/new">open an issue</a> with a detailed description and use case. Feel free <a href="https://github.com/rafalstapinski/redispatcher/pulls">open a pull request</a> if you want to contribure directly!</p>
 

@@ -35,17 +35,27 @@
   </a>
 </p>
 
-redispatcher is a library and daemon for scheduling work and running it asynchronously (like <a href="https://github.com/celery/celery" >Celery</a> or <a href="https://github.com/bogdaBogdanp/dramatiq">dramatiq</a>). It allows you to execute background tasks asynchronously, like sending a welcome email after a user registers.
+## What is redispatcher
+
+redispatcher allows you to dispatch work that needs to be done in a process separate from your main program loop. This is useful in cases when you need to process some long running work that doesn't necessarily need to be done synchronously within your code. A classic example of this is sending a welcome email to a user as they sign up for your service. It's not necessary to wait for the results of sending an email, and it may take a few seconds to do so. redispatcher lets you fire-and-forget this work (as a message put into a Redis server) and have it be executed in the background, asynchronously, in a separate process (or machine) entirely.
+
+redispatcher comes in two parts:
+1. A library that lets you define workers, define strongly typed messages sent to workers, and provides helper functions to facilitate dispatching that work
+2. A daemon that runs your workers in a pool, consistently listening for any incoming messages to be processed
 
 
+## Why use it
+
+There are certainly other solutions for orchestrating distributed workers. redispatcher aims to be super lightweight, very fast and simple to set up (there are many free cloud-hosted Redis solutions available), and has robust type validation and intellisense support.
 ## Features
 * Full intellisense support across your code, despite a distributed workload
-* Easier and faster to set up and integrate than alternatives
-* Super low overhead and completely non-blocking, thanks to `asyncio`
+* Strongly typed message contract between your publishing code and consumer
+* Minimal boilerplate required to setup and start publishing compared than most alternatives
+* Minimal performance overhead and completely non-blocking, thanks to `asyncio` (and works with alternatives like `uvloop`)
 
 ### Dependencies
-* `aioredis` to publish to Redis queues and for your consumers to read from Redis
-* `pydantic` to validate all messages and make sure they conform to the shape you specify
+* `aioredis` is used under the hood to publish message to and read messages from Redis
+* `pydantic` is used to to validate messages conform to your strongly typed contracts
 
 
 ## Installation
@@ -58,37 +68,44 @@ or with `pip`
 $ pip install redispatcher
 ```
 ## Basic Usage
-### Running your workers
+### Defining your worker
 ```python
-# my_consumer.py
 from redispatcher import BaseConsumer
 
-class MyConsumer(BaseConsumer):
+class SendWelcomeEmail(BaseConsumer):
 
-    QUEUE = "my-queue-key"
+    QUEUE = "send-welcome-email"
 
     class Message(BaseConsumer.Message):
         email: str
         name: str
-        registered: bool
     
     async def process_message(self, message: Message):
-        print(f"processing message {message}")
-        ...
-
+        # construct an email and send it to the `message.email` address
 ```
 
+### Dispatching work
 ```python
-# dispatcher.py
+from clients import my_aioredis_client
+
+@app.post("/register")
+async def register(...)
+    ...
+    message = SendWelcomeEmail.Message(email=..., name=..., registered=True)
+    await SendWelcomeEmail.dispatch(message, my_aioredis_client)
+    ...
+```
+
+### Running redispatcher
+```python
 from redispatcher import Redispatcher, RedispatcherConfig, ConsumerConfig
 
-from my_consumer import MyConsumer
-
 config = RedispatcherConfig(
-    redis_dsn="rediss://",
+    redis_dsn="redis://localhost:6379/0",
     consumers=[
         ConsumerConfig(
-            consumer_class=MyConsumer
+            consumer_class=SendWelcomeEmail,
+            count=2
         )
     ]
 )
@@ -98,27 +115,10 @@ if __name__ == "__main__":
     dispatcher.start() 
 ```
 
-```bash
-$ python dispatcher.py
-```
-
-### Publishing messages
-```python
-# endpoint.py
-
-from my_consumer import MyConsumer
-from clients import my_aioredis_client
-
-@app.post("/signup")
-async def signup()
-    ...
-    await MyConsumer.dispatch(MyConsumer.Message(email=..., name=..., registered=True), my_aioredis_client)
-    ...
-```
 
 ### Contributing
 
-`redispatcher` is ready for production usage, but is still in its infancy.
+`redispatcher` is already used in production, but is still in its infancy.
 
 If you find a bug, <a href="https://github.com/rafalstapinski/redispatcher/issues/new">open an issue</a> with a detailed description and steps to reproduce.
 
