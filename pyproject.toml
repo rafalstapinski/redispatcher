@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "redispatcher"
-version = "0.1.6"
+version = "0.2.0"
 description = "Dispatch and run distributed work asynchronously, brokered by Redis"
 authors = ["Rafal Stapinski <stapinskirafal@gmail.com>"]
 keywords = ["redis", "queue", "broker", "pub sub", "asynchronous message", "celery", "dispatcher", "worker"]
