@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from aioredis import Redis
+import redis.asyncio as redis
 from pydantic import BaseModel
 
 from redispatcher.exceptions import UndefinedMessage, UndefinedQueue
@@ -12,24 +12,24 @@ from redispatcher.types import MessageContainer
 class BaseConsumer(ABC):
 
     QUEUE: str
-    redis_client: Redis
+    redis_client: redis.Redis
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
         if not hasattr(cls, "QUEUE") or not cls.QUEUE:
             raise UndefinedQueue(f"{cls.__name__} must define a queue name")
 
-        if not cls.Message.schema().get("properties"):
+        if not cls.Message.model_json_schema().get("properties"):
             raise UndefinedMessage(f"{cls.__name__} must define a Message")
 
-    def __init__(self, redis_client: Redis):
+    def __init__(self, redis_client: redis.Redis):
         self.redis_client = redis_client
 
     @classmethod
-    async def dispatch(cls, message_body: BaseModel, redis_client: Redis):
+    async def dispatch(cls, message_body: BaseModel, redis_client: redis.Redis):
         headers = cls.headers()
-        message = MessageContainer(body=message_body.dict(), headers=headers.dict())
-        return await redis_client.rpush(cls.QUEUE, message.json())
+        message = MessageContainer(body=message_body.model_dump(), headers=headers.model_dump())
+        return await redis_client.rpush(cls.QUEUE, message.model_dump_json())
 
     def __repr__(self) -> str:
         return f"<redispatcher Consumer: {self.QUEUE}>"
