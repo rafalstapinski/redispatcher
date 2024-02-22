@@ -1,7 +1,8 @@
 from threading import Event
 from typing import List, Optional, Type, Union
 
-from pydantic import BaseModel, BaseSettings, RedisDsn
+from pydantic import BaseModel, RedisDsn
+from pydantic_settings import BaseSettings
 
 from redispatcher.base_consumer import BaseConsumer
 from redispatcher.types import LoggerType
