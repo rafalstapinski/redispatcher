@@ -70,4 +70,4 @@ class NicerConsumer(OurBaseConsumer):
         print(f"nice consumer processing message {message}")
         # lets imitate some IO blocking operation
         await asyncio.sleep(2)
-        print(f"nice consumer done processing message")
+        print("nice consumer done processing message")

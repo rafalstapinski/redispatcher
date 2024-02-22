@@ -1,4 +1,3 @@
-from multiprocessing.managers import BaseManager
 
 from pydantic import BaseModel
 

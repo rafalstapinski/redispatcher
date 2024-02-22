@@ -2,20 +2,21 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from logging import Logger
 
-import aioredis
-from aioredis import Redis
+import redis.asyncio as redis
 
 from redispatcher.base_consumer import BaseConsumer
 from redispatcher.config import RedispatcherConfig
-from redispatcher.types import LoggerType, MessageContainer
+from redispatcher.types import MessageContainer
+from redispatcher.utils import create_client
 
 
 class Redispatcher:
 
-    redis_client: Redis
+    redis_client: redis.Redis
     config: RedispatcherConfig
-    logger: LoggerType
+    logger: Logger
     consumer_pool: asyncio.Queue[BaseConsumer]
 
     def __init__(self, config: RedispatcherConfig):
@@ -28,9 +29,9 @@ class Redispatcher:
 
         # Parse
         try:
-            message = MessageContainer.parse_raw(message_str)
-            message_body = consumer.Message.parse_obj(message.body)
-            message_headers = consumer.Headers.parse_obj(message.headers)
+            message = MessageContainer.model_validate_json(message_str)
+            message_body = consumer.Message.model_validate(message.body)
+            message_headers = consumer.Headers.model_validate(message.headers)
         except Exception as e:
             self.logger.exception(f"Error parsing message {consumer=} {message_str=} {e=}")
 
@@ -43,7 +44,7 @@ class Redispatcher:
     async def _run(self):
         self.logger.info("Starting redispatcher")
 
-        self.redis_client = await aioredis.create_redis(self.config.redis_dsn)
+        self.redis_client = create_client(self.config.redis_dsn)
 
         # Toss consumers on the queue
         for consumer_config in self.config.consumers:
@@ -64,7 +65,7 @@ class Redispatcher:
 
             # Check for configured exit event. Tbh mostly used for testing
             if self.config.exit_event and self.config.exit_event.is_set():
-                self.logger.info(f"Got exit event, exiting")
+                self.logger.info("Got exit event, exiting")
                 return
 
             # Wait for next available consumer
@@ -74,10 +75,12 @@ class Redispatcher:
             message = await self.redis_client.lpop(consumer.QUEUE)
 
             # Let's consume it
-            if message:
+            if message and isinstance(message, str):
                 # We use ensure_future to run this bit of work in the background so we
                 # can move on to listening for messages from the next available worker
                 asyncio.ensure_future(self._consume(consumer, message))
+            else:
+                self.logger.error(f"could not consume message {message=}")
 
             await self.consumer_pool.put(consumer)
 

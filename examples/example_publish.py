@@ -1,18 +1,17 @@
 import asyncio
 import os
 
-import aioredis
 from elasticapm.base import DummyClient as APMClient
 
 from examples import basic_consumer, nicer_consumer
+from redispatcher.utils import create_client
 
 
 async def run():
-
     BasicConsumer = basic_consumer.BasicConsumer
     NicerConsumer = nicer_consumer.NicerConsumer
 
-    redis_pool = await aioredis.create_redis_pool(os.environ["REDIS_DSN"])
+    redis_pool = await create_client(os.environ["REDIS_DSN"])
 
     # Publish a basic message to a basic consumer
 
