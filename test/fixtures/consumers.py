@@ -12,8 +12,7 @@ class ConsumerOne(BaseConsumer):
         id: int
         text: str
 
-    async def process_message(self, message: Message, headers: BaseConsumer.Headers):
-        ...
+    async def process_message(self, message: Message, headers: BaseConsumer.Headers): ...
 
 
 class ConsumerTwo(BaseConsumer):
