@@ -1,5 +1,4 @@
 import logging
-import os
 from logging import Logger
 from threading import Event
 from typing import Type
